@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:vector_math/vector_math_64.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() => runApp(MaterialApp(home: MyApp()));
 
@@ -11,6 +13,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late ARKitController arkitController;
+  final controller = Completer<WebViewController>();
 
   @override
   void dispose() {
@@ -21,7 +24,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
+      // body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
+      body: WebViewWidget(controller: WebViewController()..loadRequest(Uri.parse("https://appleid.apple.com/"))));
 
   void onARKitViewCreated(ARKitController arkitController) {
     setState(() {
