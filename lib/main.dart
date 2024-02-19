@@ -24,15 +24,37 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
-      // body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
-      body: WebViewWidget(controller: WebViewController()..loadRequest(Uri.parse("https://appleid.apple.com/"))));
+      body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
 
   void onARKitViewCreated(ARKitController arkitController) {
     setState(() {
       this.arkitController = arkitController;
     });
+    // final node = ARKitNode(
+    //   geometry: ARKitSphere(
+    //     materials: [
+    //       ARKitMaterial(
+    //         diffuse: ARKitMaterialProperty.image("assets/NCG255-scaled.jpg"),
+    //         doubleSided: true,
+    //       ),
+    //     ],
+    //     radius: 1
+    //   ),
+    //   position: Vector3(0, 0, 0),
+    // );
     final node = ARKitNode(
-        geometry: ARKitSphere(radius: 0.1), position: Vector3(0, 0, -0.5));
-    this.arkitController.add(node);
+      geometry: ARKitPlane(
+        height: 0.5,
+        width: 0.5,
+        materials : [
+          ARKitMaterial(
+            diffuse: ARKitMaterialProperty.image("assets/NCG255-scaled.jpg"),
+            doubleSided: true,
+          ),
+        ],
+      ),
+      position: Vector3(0, 0, 0.5),
+    );
+    arkitController.add(node);
   }
 }
