@@ -15,8 +15,9 @@ class _MyAppState extends State<MyApp> {
   late ARKitController arkitController;
   final controller = Completer<WebViewController>();
   final List<String> paths = ["assets/book/page1.jpeg", "assets/book/page2.jpeg", "assets/book/page3.jpeg", "assets/book/page4.jpeg"];
-  int path_index = 0;
-  String sample = "Not tapped.";
+  int pathIndex = 0;
+  late ARKitNode node;
+  Vector3 pos = Vector3(0, 0, 0);
 
   @override
   void dispose() {
@@ -28,16 +29,18 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('ARKit in Flutter')),
     body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
-    // floatingActionButton: FloatingActionButton(
-    //   onPressed: () {
-    //     index += 1;
-    //     if (index == paths.length){
-    //       index = 0;
-    //     }
-    //     arkitController.remove("page");
-    //     onARKitViewCreated(arkitController);
-    //   },
-    // ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        Vector3 relativePosition = Vector3(0, -0.2, -0.2);
+        arkitController.cameraPosition().then((value) {
+          Vector3 origin = value!;
+          pos = origin + relativePosition;
+          node.position = pos;
+          arkitController.remove("page");
+          arkitController.add(node);
+        });
+      },
+    ),
     bottomNavigationBar: BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
@@ -54,37 +57,36 @@ class _MyAppState extends State<MyApp> {
   );
 
   void onARKitViewCreated(ARKitController arkitController) {
-    setState(() {
-      this.arkitController = arkitController;
-    });
-    ARKitNode node = ARKitNode(
+    this.arkitController = arkitController;
+    node = ARKitNode(
       geometry: ARKitPlane(
-        height: 0.3,
-        width: 0.3,
+        height: 0.2,
+        width: 0.2,
         materials : [
           ARKitMaterial(
-            diffuse: ARKitMaterialProperty.image(paths[path_index]),
+            diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
             doubleSided: true,
           ),
         ],
       ),
       name: "page",
-      position: Vector3(0, 0, -0.3),
+      position: pos,
+      eulerAngles: Vector3(0, 30, 0),
     );
     arkitController.add(node);
   }
 
   void _onItemTapped(int index) {
     if (index == 0) {
-      path_index -= 1;
-      if (path_index < 0) {
-        path_index = paths.length - 1;
+      pathIndex -= 1;
+      if (pathIndex < 0) {
+        pathIndex = paths.length - 1;
       }
     }
     else {
-      path_index += 1;
-      if (index == paths.length) {
-        path_index = 0;
+      pathIndex += 1;
+      if (pathIndex == paths.length) {
+        pathIndex = 0;
       }
     }
     arkitController.remove("page");
