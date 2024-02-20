@@ -26,33 +26,25 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: GestureDetector(
-        // child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
-        onTap: () {
-          setState(() {
-            // index += 1;
-            sample = "Tapped.";
-          });
-        },
-          // タッチ検出対象のWidget
-        child: Text(
-          sample,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
+    appBar: AppBar(title: const Text('ARKit in Flutter')),
+    body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        index += 1;
+        arkitController.remove("page");
+        onARKitViewCreated(arkitController);
+      },
+    ),
   );
 
   void onARKitViewCreated(ARKitController arkitController) {
     setState(() {
       this.arkitController = arkitController;
     });
-    final node = ARKitNode(
+    ARKitNode node = ARKitNode(
       geometry: ARKitPlane(
-        height: 0.5,
-        width: 0.5,
+        height: 0.3,
+        width: 0.3,
         materials : [
           ARKitMaterial(
             diffuse: ARKitMaterialProperty.image(paths[index]),
@@ -60,7 +52,8 @@ class _MyAppState extends State<MyApp> {
           ),
         ],
       ),
-      position: Vector3(0, 0, -2),
+      name: "page",
+      position: Vector3(0, 0, -0.3),
     );
     arkitController.add(node);
   }
