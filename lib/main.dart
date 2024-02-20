@@ -14,6 +14,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late ARKitController arkitController;
   final controller = Completer<WebViewController>();
+  final List<String> paths = ["assets/book/page1.jpeg", "assets/book/page2.jpeg", "assets/book/page3.jpeg", "assets/book/page4.jpeg"];
+  int index = 0;
+  String sample = "Not tapped.";
 
   @override
   void dispose() {
@@ -24,36 +27,40 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
+      body: GestureDetector(
+        // child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
+        onTap: () {
+          setState(() {
+            // index += 1;
+            sample = "Tapped.";
+          });
+        },
+          // タッチ検出対象のWidget
+        child: Text(
+          sample,
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+  );
 
   void onARKitViewCreated(ARKitController arkitController) {
     setState(() {
       this.arkitController = arkitController;
     });
-    // final node = ARKitNode(
-    //   geometry: ARKitSphere(
-    //     materials: [
-    //       ARKitMaterial(
-    //         diffuse: ARKitMaterialProperty.image("assets/NCG255-scaled.jpg"),
-    //         doubleSided: true,
-    //       ),
-    //     ],
-    //     radius: 1
-    //   ),
-    //   position: Vector3(0, 0, 0),
-    // );
     final node = ARKitNode(
       geometry: ARKitPlane(
         height: 0.5,
         width: 0.5,
         materials : [
           ARKitMaterial(
-            diffuse: ARKitMaterialProperty.image("assets/NCG255-scaled.jpg"),
+            diffuse: ARKitMaterialProperty.image(paths[index]),
             doubleSided: true,
           ),
         ],
       ),
-      position: Vector3(0, 0, 0.5),
+      position: Vector3(0, 0, -2),
     );
     arkitController.add(node);
   }

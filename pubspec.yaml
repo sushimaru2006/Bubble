@@ -65,6 +65,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/NCG255-scaled.jpg
+    - assets/book/page1.jpeg
+    - assets/book/page2.jpeg
+    - assets/book/page3.jpeg
+    - assets/book/page4.jpeg
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
