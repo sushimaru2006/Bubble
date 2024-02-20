@@ -15,7 +15,7 @@ class _MyAppState extends State<MyApp> {
   late ARKitController arkitController;
   final controller = Completer<WebViewController>();
   final List<String> paths = ["assets/book/page1.jpeg", "assets/book/page2.jpeg", "assets/book/page3.jpeg", "assets/book/page4.jpeg"];
-  int index = 0;
+  int path_index = 0;
   String sample = "Not tapped.";
 
   @override
@@ -28,12 +28,28 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('ARKit in Flutter')),
     body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () {
-        index += 1;
-        arkitController.remove("page");
-        onARKitViewCreated(arkitController);
-      },
+    // floatingActionButton: FloatingActionButton(
+    //   onPressed: () {
+    //     index += 1;
+    //     if (index == paths.length){
+    //       index = 0;
+    //     }
+    //     arkitController.remove("page");
+    //     onARKitViewCreated(arkitController);
+    //   },
+    // ),
+    bottomNavigationBar: BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.arrow_back),
+          label: 'Back',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.arrow_forward),
+          label: 'Next',
+        ),
+      ],
+      onTap: _onItemTapped,
     ),
   );
 
@@ -47,7 +63,7 @@ class _MyAppState extends State<MyApp> {
         width: 0.3,
         materials : [
           ARKitMaterial(
-            diffuse: ARKitMaterialProperty.image(paths[index]),
+            diffuse: ARKitMaterialProperty.image(paths[path_index]),
             doubleSided: true,
           ),
         ],
@@ -56,5 +72,22 @@ class _MyAppState extends State<MyApp> {
       position: Vector3(0, 0, -0.3),
     );
     arkitController.add(node);
+  }
+
+  void _onItemTapped(int index) {
+    if (index == 0) {
+      path_index -= 1;
+      if (path_index < 0) {
+        path_index = paths.length - 1;
+      }
+    }
+    else {
+      path_index += 1;
+      if (index == paths.length) {
+        path_index = 0;
+      }
+    }
+    arkitController.remove("page");
+    onARKitViewCreated(arkitController);
   }
 }
