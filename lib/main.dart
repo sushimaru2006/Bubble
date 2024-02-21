@@ -47,10 +47,17 @@ class _MyAppState extends State<MyApp> {
     body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
     floatingActionButton: FloatingActionButton(
       onPressed: () {
+        // カメラの座標を取得
         arkitController.cameraPosition().then((camPos) {
+          // カメラの回転を取得
           arkitController.getCameraEulerAngles().then((camRot) {
+            // nodeの場所を計算。自分の周囲0.2の円周上を動かす
             pos = Vector3(relativePosition.x * sin(camRot.y), relativePosition.y, relativePosition.z * cos(camRot.y)) + camPos!;
             node.position = pos;
+
+            // nodeの向きを変更
+            node.eulerAngles = rot + Vector3(camRot.y, 0, 0);
+
             arkitController.remove("page");
             arkitController.add(node);
           });
