@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
+import 'package:flutter/rendering.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'dart:math';
+
 
 void main() => runApp(MaterialApp(home: MyApp()));
 
@@ -12,12 +15,25 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // arkitのコントローラー
   late ARKitController arkitController;
+
   final controller = Completer<WebViewController>();
+
+  // 画像のパス
   final List<String> paths = ["assets/book/page1.jpeg", "assets/book/page2.jpeg", "assets/book/page3.jpeg", "assets/book/page4.jpeg"];
+  // 画像パスのインデックス
   int pathIndex = 0;
+
+  // arNode
   late ARKitNode node;
-  Vector3 pos = Vector3(0, 0, 0);
+
+  // Nodeの位置と回転
+  Vector3 pos = Vector3(0, -0.2, -0.2);
+  Vector3 rot = Vector3(0, 30, 0);
+
+  // カメラの位置からの相対的な位置と回転
+  Vector3 relativePosition = Vector3(-0.2, -0.2, -0.2);
 
   @override
   void dispose() {
@@ -31,13 +47,13 @@ class _MyAppState extends State<MyApp> {
     body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
     floatingActionButton: FloatingActionButton(
       onPressed: () {
-        Vector3 relativePosition = Vector3(0, -0.2, -0.2);
-        arkitController.cameraPosition().then((value) {
-          Vector3 origin = value!;
-          pos = origin + relativePosition;
-          node.position = pos;
-          arkitController.remove("page");
-          arkitController.add(node);
+        arkitController.cameraPosition().then((camPos) {
+          arkitController.getCameraEulerAngles().then((camRot) {
+            pos = Vector3(relativePosition.x * sin(camRot.y), relativePosition.y, relativePosition.z * cos(camRot.y)) + camPos!;
+            node.position = pos;
+            arkitController.remove("page");
+            arkitController.add(node);
+          });
         });
       },
     ),
@@ -71,7 +87,7 @@ class _MyAppState extends State<MyApp> {
       ),
       name: "page",
       position: pos,
-      eulerAngles: Vector3(0, 30, 0),
+      eulerAngles: rot,
     );
     arkitController.add(node);
   }
