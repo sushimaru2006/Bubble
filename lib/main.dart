@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
     ),
   );
 
-  void onARKitViewCreated(ARKitController arkitController) {
+  void onARKitViewCreated(ARKitController arkitController) async {
     this.arkitController = arkitController;
     node = ARKitNode(
       geometry: ARKitPlane(
@@ -89,7 +89,8 @@ class _MyAppState extends State<MyApp> {
         width: 0.2,
         materials : [
           ARKitMaterial(
-            diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
+            // diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
+            diffuse: ARKitMaterialProperty.image("https://picsum.photos/250?image=9"),
             doubleSided: true,
           ),
         ],
