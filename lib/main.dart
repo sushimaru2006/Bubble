@@ -29,11 +29,12 @@ class _MyAppState extends State<MyApp> {
   late ARKitNode node;
 
   // Nodeの位置と回転
-  Vector3 pos = Vector3(0, -0.2, -0.2);
-  Vector3 rot = Vector3(0, 30, 0);
+  Vector3 pos = Vector3(0, -0.1, -0.1);
+  Vector3 rot = Vector3(0, -20, 0);
 
   // カメラの位置からの相対的な位置と回転
-  Vector3 relativePosition = Vector3(-0.2, -0.2, -0.2);
+  Vector3 relativePosition = Vector3(-0.2, -0.1, -0.1);
+  Vector3 relativeRotation = Vector3(0, -20, 0);
 
   @override
   void dispose() {
@@ -56,7 +57,8 @@ class _MyAppState extends State<MyApp> {
             node.position = pos;
 
             // nodeの向きを変更
-            node.eulerAngles = rot + Vector3(camRot.y, 0, 0);
+            rot = relativeRotation + Vector3(camRot.y, 0, 0);
+            node.eulerAngles = rot;
 
             arkitController.remove("page");
             arkitController.add(node);
