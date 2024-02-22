@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -39,11 +41,12 @@ class _MyAppState extends State<MyApp> {
         arkitController.cameraPosition().then((camPos) {
           arkitController.getCameraEulerAngles().then((camRot) {
             pos = Vector3(relativePosition.x * sin(camRot.y), relativePosition.y, relativePosition.z * cos(camRot.y)) + camPos!;
-            node.position = pos;
+            // node.position = pos;
             rot = relativeRotation + Vector3(camRot.y, 0, 0);
-            node.eulerAngles = rot;
+            // node.eulerAngles = rot;
             arkitController.remove("page");
-            arkitController.add(node);
+            // arkitController.add(node);
+            _takeWebViewScreenshot();
           });
         });
       },
@@ -73,7 +76,7 @@ class _MyAppState extends State<MyApp> {
          // onProgressChanged: ,
         ),
         Padding(
-          padding: EdgeInsets.only(right: 20, left: 20),
+          padding: const EdgeInsets.only(right: 20, left: 20),
           child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
         ),
       ],
@@ -96,22 +99,23 @@ class _MyAppState extends State<MyApp> {
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
-    node = ARKitNode(
-      geometry: ARKitPlane(
-        height: 0.2,
-        width: 0.2,
-        materials: [
-          ARKitMaterial(
-            diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
-            doubleSided: true,
-          ),
-        ],
-      ),
-      name: "page",
-      position: pos,
-      eulerAngles: rot,
-    );
-    arkitController.add(node);
+    // node = ARKitNode(
+    //   geometry: ARKitPlane(
+    //     height: 0.2,
+    //     width: 0.2,
+    //     materials: [
+    //       ARKitMaterial(
+    //         diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
+    //         doubleSided: true,
+    //       ),
+    //     ],
+    //   ),
+    //   name: "page",
+    //   position: pos,
+    //   eulerAngles: rot,
+    // );
+    // arkitController.add(node);
+    _takeWebViewScreenshot();
   }
 
   void _onItemTapped(int index) {
@@ -124,41 +128,57 @@ class _MyAppState extends State<MyApp> {
       pathIndex += 1;
       if (pathIndex == paths.length) {
         pathIndex = 0;
-      }
     }
+    }
+  }
   void _takeWebViewScreenshot() async {
   // InAppWebViewControllerからスクリーンショットを取得
     Uint8List? screenshotBytes = await inAppWebViewController.takeScreenshot();
     if (screenshotBytes != null) {
-    // スクリーンショットを使用して画像を作成
-    // Image image = Image.memory(screenshotBytes);
+      // スクリーンショットを使用して画像を作成
+      // Image image = Image.memory(screenshotBytes);
 
-    // 画像を表示
-    this.arkitController = arkitController;
-    node = ARKitNode(
-      geometry: ARKitPlane(
-        height: 0.2,
-        width: 0.2,
-        materials: [
-          ARKitMaterial(
-            diffuse: ARKitMaterialImage(
-              Uint8List.fromList(screenshotBytes).toString()
+      // 画像を表示
+      arkitController = arkitController;
+      node = ARKitNode(
+        geometry: ARKitPlane(
+          height: 0.2,
+          width: 0.2,
+          materials: [
+            ARKitMaterial(
+              diffuse: ARKitMaterialProperty.image(
+                base64Encode(screenshotBytes)
+              ),
+              doubleSided: true,
             ),
-            doubleSided: true,
-          ),
-        ],
-      ),
-      name: "page",
-      position: pos,
-      eulerAngles: rot,
-    );
-    arkitController.add(node);
-  } else {
-    // エラー処理
-    print('Failed to capture screenshot');
-  }
-}
-    arkitController.remove("page");
-    onARKitViewCreated(arkitController);
+          ],
+        ),
+        name: "page",
+        position: pos,
+        eulerAngles: rot,
+      );
+      arkitController.add(node);
+    } else {
+      node = ARKitNode(
+        geometry: ARKitPlane(
+          height: 0.2,
+          width: 0.2,
+          materials: [
+            ARKitMaterial(
+              diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
+              doubleSided: true,
+            ),
+          ],
+        ),
+        name: "page",
+        position: pos,
+        eulerAngles: rot,
+      );
+      arkitController.add(node);
+      // エラー処理
+      print('Failed to capture screenshot');
+    }
+    // arkitController.remove("page");
+    // onARKitViewCreated(arkitController);
   }
 }
