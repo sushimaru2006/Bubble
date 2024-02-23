@@ -40,23 +40,33 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/kindleRoute');
-              },
-              child: const Text('kindle'),
+            Padding(
+              padding: const EdgeInsets.all(15),
+                child:ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/kindleRoute');
+                },
+                child: const Text('kindle'),
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/driveRoute');
-              },
-              child: const Text('googledrive'),
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/driveRoute');
+                },
+                child: const Text('googledrive'),
+              ),
             ),
-            ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/sample');
               },
-              child: const Text('sample'))
+              child: const Text('sample PageView')
+              )
+            ),
           ],
         ),
       ),
@@ -351,11 +361,11 @@ class _SampleState extends State<Sample> {
   late ARKitNode node;
 
   // Nodeの位置と回転
-  Vector3 pos = Vector3(0, -0.12, -0.12);
+  Vector3 pos = Vector3(0, -0.14, -0.14);
   Vector3 rot = Vector3(0, -20, 0);
 
   // カメラの位置からの相対的な位置と回転
-  Vector3 relativePosition = Vector3(-0.12, -0.12, -0.12);
+  Vector3 relativePosition = Vector3(-0.14, -0.14, -0.14);
   Vector3 relativeRotation = Vector3(0, -20, 0);
 
   // スライダーの値
@@ -367,6 +377,33 @@ class _SampleState extends State<Sample> {
     super.dispose();
   }
 
+  Widget _buildFloatingActionButton() {
+    return GestureDetector(
+      onTap: () {
+        arkitController.cameraPosition().then((camPos) {
+          arkitController.getCameraEulerAngles().then((camRot) {
+            pos = Vector3(relativePosition.x * sin(camRot.y), relativePosition.y, relativePosition.z * cos(camRot.y)) + camPos!;
+            rot = relativeRotation + Vector3(camRot.y, 0, 0);
+            node.position = pos;
+            node.eulerAngles = rot;
+            arkitController.remove("page");
+            arkitController.add(node);
+          });
+        });
+      },
+      child: Container(
+        height: 2000,
+        width: 54,
+        margin: const EdgeInsets.only(right: 50, bottom: 50),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: const Icon(Icons.add, size: 25),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Stack(
@@ -375,10 +412,10 @@ class _SampleState extends State<Sample> {
           // ARのScene
           child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
         ),
-        // 上にスライダーを重ねる
+        _buildFloatingActionButton(),
         Positioned(
-          top: 50,
-          left: 50,
+          top: 70,
+          right: 10,
           child: RotatedBox(
             quarterTurns: 3,
             child: Slider(
@@ -402,23 +439,9 @@ class _SampleState extends State<Sample> {
     ),
     floatingActionButton: FloatingActionButton(
       onPressed: () {
-        // カメラの座標を取得
-        arkitController.cameraPosition().then((camPos) {
-          // カメラの回転を取得
-          arkitController.getCameraEulerAngles().then((camRot) {
-            // nodeの場所を計算。自分の周囲0.2の円周上を動かす
-            pos = Vector3(relativePosition.x * sin(camRot.y), relativePosition.y, relativePosition.z * cos(camRot.y)) + camPos!;
-            node.position = pos;
-
-            // nodeの向きを変更
-            rot = relativeRotation + Vector3(camRot.y, 0, 0);
-            node.eulerAngles = rot;
-
-            arkitController.remove("page");
-            arkitController.add(node);
-          });
-        });
+      Navigator.pop(context);
       },
+      child: const Icon(Icons.arrow_back),
     ),
     bottomNavigationBar: BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
