@@ -7,19 +7,157 @@ import 'package:vector_math/vector_math_64.dart';
 import 'dart:math';
 import 'dart:typed_data';
 
-void main() => runApp(MaterialApp(home: MyApp()));
+void main() => runApp(MaterialApp(home: Init()));
 
-class MyApp extends StatefulWidget {
+class Init extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+      ),
+      home: HomePage(key),
+      routes: {
+        '/kindleRoute': (context) => Kindle(key),
+        '/driveRoute': (context) => GoogleDrive(key),
+      },
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class HomePage extends StatelessWidget {
+  const HomePage(Key? key) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/kindleRoute');
+              },
+              child: const Text('kindle'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/driveRoute');
+              },
+              child: const Text('googledrive'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Kindle extends StatefulWidget {
+  const Kindle(Key? key) : super(key: key);
+
+  @override
+  _KindleState createState() => _KindleState();
+}
+
+
+class _KindleState extends State<Kindle> {
+  late InAppWebViewController inAppWebViewController;
+  final uri = WebUri("https://read.amazon.co.jp/kindle-library");
+  String currentUrl = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('kindle'),
+      ),
+      body: InAppWebView(
+        initialUrlRequest: URLRequest(url: uri),
+        onLoadStop: (controller, url) {
+          setState(() {
+            currentUrl = url.toString();
+          });
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AR(currentUrl: currentUrl),
+              ),
+            );
+          },
+          child: const Text('AR mode'),
+        ),
+      ),
+    );
+  }
+}
+
+class GoogleDrive extends StatefulWidget {
+  const GoogleDrive(Key? key) : super(key: key);
+
+  @override
+  _GoogleDriveState createState() => _GoogleDriveState();
+}
+
+class _GoogleDriveState extends State<GoogleDrive> {
+  late InAppWebViewController inAppWebViewController;
+  final uri = WebUri("https://drive.google.com/drive/u/0/home");
+  String currentUrl = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('GoogleDrive'),
+      ),
+      body: InAppWebView(
+        initialUrlRequest: URLRequest(url: uri),
+        onLoadStop: (controller, url) {
+          setState(() {
+            currentUrl = url.toString();
+          });
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AR(currentUrl: currentUrl),
+              ),
+            );
+          },
+          child: const Text('AR mode'),
+        ),
+      ),
+    );
+  }
+}
+class AR extends StatefulWidget {
+  final String currentUrl;
+
+  const AR({Key? key, required this.currentUrl}) : super(key: key);
+  @override
+  _ARState createState() => _ARState();
+}
+
+class _ARState extends State<AR> {
   late ARKitController arkitController;
   late InAppWebViewController inAppWebViewController;
+  String currentUrl = '';
 
-
-  final uri =  WebUri("https://read.amazon.co.jp/manga/B07QQPYZ2R?sample=true&ref_=kwl_kr_iv_rec_1");
+  late final uri =  WebUri(currentUrl);
   final List<String> paths = ["assets/book/page1.jpeg", "assets/book/page2.jpeg", "assets/book/page3.jpeg", "assets/book/page4.jpeg"];
 
   int pathIndex = 0;
@@ -42,6 +180,12 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    currentUrl = widget.currentUrl;
+  }
+
   Widget _buildFloatingActionButton() {
     return GestureDetector(
       onTap: () {
@@ -55,9 +199,9 @@ class _MyAppState extends State<MyApp> {
         });
       },
       child: Container(
-        height: 54,
+        height: 2000,
         width: 54,
-        margin: const EdgeInsets.only(right: 17, bottom: 50),
+        margin: const EdgeInsets.only(right: 50, bottom: 50),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
         ),
@@ -80,12 +224,13 @@ class _MyAppState extends State<MyApp> {
          // onProgressChanged: ,
         ),
         Padding(
-          padding: const EdgeInsets.only(bottom: 50),
+          padding: const EdgeInsets.only(top: 109),
           child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
         ),
+        _buildFloatingActionButton(),
         Positioned(
-          top: 50,
-          left: 70,
+          top: 70,
+          right: 10,
           child: RotatedBox(
             quarterTurns: 3,
             child: Slider(
@@ -107,19 +252,12 @@ class _MyAppState extends State<MyApp> {
         )
       ],
     ),
-    floatingActionButton: _buildFloatingActionButton(),
-    bottomNavigationBar: BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.arrow_back),
-          label: 'Back',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.arrow_forward),
-          label: 'Next',
-        ),
-      ],
-      onTap: _onItemTapped,
+    floatingActionButton: FloatingActionButton(
+      onPressed: () {
+      Navigator.pop(context);
+      },
+      child: const Icon(Icons.arrow_back),
+
     ),
   );
 
@@ -141,6 +279,7 @@ class _MyAppState extends State<MyApp> {
     }
     }
   }
+
   void _takeWebViewScreenshot() async {
   // InAppWebViewControllerからスクリーンショットを取得
     Uint8List? screenshotBytes = await inAppWebViewController.takeScreenshot();
@@ -183,7 +322,7 @@ class _MyAppState extends State<MyApp> {
       );
       arkitController.add(node);
       // エラー処理
-      print('Failed to capture screenshot');
+      // print('Failed to capture screenshot');
     }
   }
 }
