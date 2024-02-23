@@ -321,22 +321,22 @@ class _ARState extends State<AR> {
       );
       arkitController.add(node);
     } else {
-      node = ARKitNode(
-        geometry: ARKitPlane(
-          height: 0.2,
-          width: 0.2,
-          materials: [
-            ARKitMaterial(
-              diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
-              doubleSided: true,
-            ),
-          ],
-        ),
-        name: "page",
-        position: pos,
-        eulerAngles: rot,
-      );
-      arkitController.add(node);
+      // node = ARKitNode(
+      //   geometry: ARKitPlane(
+      //     height: 0.2,
+      //     width: 0.2,
+      //     materials: [
+      //       ARKitMaterial(
+      //         diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
+      //         doubleSided: true,
+      //       ),
+      //     ],
+      //   ),
+      //   name: "page",
+      //   position: pos,
+      //   eulerAngles: rot,
+      // );
+      // arkitController.add(node);
       // エラー処理
       // print('Failed to capture screenshot');
     }
@@ -467,7 +467,6 @@ class _SampleState extends State<Sample> {
         materials : [
           ARKitMaterial(
             diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
-            // diffuse: ARKitMaterialProperty.image("https://picsum.photos/250?image=9"),
             doubleSided: true,
           ),
         ],
