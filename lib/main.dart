@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:arkit_plugin/arkit_plugin.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -14,9 +13,6 @@ class Init extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-
-      ),
       home: HomePage(key),
       routes: {
         '/kindleRoute': (context) => Kindle(key),
@@ -240,7 +236,7 @@ class _ARState extends State<AR> {
          // onProgressChanged: ,
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 109),
+          padding: const EdgeInsets.only(top: 120),
           child: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
         ),
         _buildFloatingActionButton(),
@@ -321,24 +317,6 @@ class _ARState extends State<AR> {
       );
       arkitController.add(node);
     } else {
-      // node = ARKitNode(
-      //   geometry: ARKitPlane(
-      //     height: 0.2,
-      //     width: 0.2,
-      //     materials: [
-      //       ARKitMaterial(
-      //         diffuse: ARKitMaterialProperty.image(paths[pathIndex]),
-      //         doubleSided: true,
-      //       ),
-      //     ],
-      //   ),
-      //   name: "page",
-      //   position: pos,
-      //   eulerAngles: rot,
-      // );
-      // arkitController.add(node);
-      // エラー処理
-      // print('Failed to capture screenshot');
     }
   }
 }
